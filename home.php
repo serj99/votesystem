@@ -21,8 +21,23 @@ if($stmt = $mysqli->prepare($query)) {
     $stmt->close();
 }
 
-date_default_timezone_set("Europe/Bucharest");
+
 $uservoted = 0;
+$query = "SELECT id_votant FROM voturi WHERE id_votant=?";
+if($stmt = $mysqli->prepare($query)) {
+    $stmt->bind_param("i", $_SESSION['user_id']);
+    $stmt->bind_result($user_id);
+    $stmt->execute();
+    $stmt->fetch();
+    
+    //if we find the user_id on voturi table
+    //the user voted before
+    if($user_id)
+        $uservoted = 1;
+    $stmt->close();
+}
+
+date_default_timezone_set("Europe/Bucharest");
 if(isset($_POST['btn-vote'])) {
     $voter_id = $_SESSION['user_id'];
     $candidate_id = $_POST['candidate'];
@@ -46,6 +61,14 @@ if(isset($_POST['btn-vote'])) {
         $stmt->close();
         $uservoted = 1;
     }
+    
+    $query = "UPDATE judet SET total_votanti = total_votanti + 1
+              WHERE nume_judet = ?";
+    if($stmt = $mysqli->prepare($query)) {
+        $stmt->bind_param("s", $county);
+        $stmt->execute();
+        $stmt->close();
+    }
 }
  
 ?>
@@ -58,6 +81,8 @@ if(isset($_POST['btn-vote'])) {
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Simulare votari regionale</title>
 <link rel="stylesheet" href="style.css" type="text/css" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type='text/javascript' src='script.js'></script> 
 </head>
 
 
@@ -77,11 +102,67 @@ if(isset($_POST['btn-vote'])) {
   <div id="nav">
     <ul>
       <li><a href="home.php">Acasa</a></li>
-      <li><a href="book-add.php">Genereaza sondaje</a></li>
+      <li><a href="generatepolls.php">Genereaza sondaje</a></li>
     </ul>
   </div>
 
-  <?php if($uservoted == 0) : ?>    
+  <?php if(isset($_SESSION['root'])) : ?>
+    <table>
+      <tr>
+        <td>
+          Alege candidat pentru eliminare din baza de date
+          <select id='candid_to_del' name='candid_to_del'>
+            <?php
+                $query = "SELECT id_candidat, nume, prenume
+                          FROM candidat";
+                if($stmt = $mysqli->prepare($query)) {
+                    $stmt->bind_result($cand_id, $cand_sname, $cand_fname);
+                    $stmt->execute();
+                    while($stmt->fetch()) 
+                        echo "<option value='$cand_id'>$cand_sname $cand_fname</option>";
+                    $stmt->close();
+                }
+            ?>
+            </select>   
+        </td>
+        <td>
+          <button id='BttnDelCandid' class='redbttn'>Eliminare</button>
+        </td>
+        <td> 
+          <a href="ins_candid.php"><button id='BttnInsertCandid' class='greenbttn'>Adauga candidat</button></a>
+        </td>
+      </tr>
+      <tr>
+        <td id='MssgDelCandid'colspan='2'></td>
+      </tr>
+      <tr>
+        <td>
+          Alege partid pentru eliminare din baza de date
+          <select id='party_to_del' name='party_to_del'>
+          <?php
+              $query = "SELECT nume_partid FROM partid";
+              if($stmt = $mysqli->prepare($query)) {
+                  $stmt->bind_result($partyname);
+                  $stmt->execute();
+                  while($stmt->fetch())
+                      echo "<option value='{$partyname}'>$partyname</option>";
+                  $stmt->close();
+              }
+          ?>
+          </select>
+        </td>
+        <td>
+          <button id='BttnDelParty' class='redbttn'>Eliminare</button>
+        </td>
+        <td>
+          <a href="ins_party.php"><button id='BttnInsertParty' class='greenbttn' >Adauga partid</button></a>
+        </td>
+      <tr>
+        <td id='MssgDelParty'colspan='2'></td>
+      </tr>
+    </table>  
+
+  <?php elseif (!isset($_SESSION['root']) && $uservoted == 0) : ?>    
       <form id='voteform' method="post">
         <table>
           <tr>
@@ -117,7 +198,8 @@ if(isset($_POST['btn-vote'])) {
           </tr>
           <tr>
             <td><label for='party'>Partid</label></td>
-            <td><select id='party' name='party'>
+            <td>
+              <select id='party' name='party'>
               <?php
                   $query = "SELECT nume_partid FROM partid";
                   if($stmt = $mysqli->prepare($query)) {
@@ -128,6 +210,7 @@ if(isset($_POST['btn-vote'])) {
                       $stmt->close();
                   }
               ?>
+              </select>
             </td>
           </tr>
           <tr>
@@ -144,24 +227,54 @@ if(isset($_POST['btn-vote'])) {
           </tr>
         </table>
   <?php 
-    endif; 
-    if($uservoted == 1) : 
+    elseif( !isset($_SESSION['root']) && $uservoted == 1) : 
   ?>
-    <div id='green_message'>Votul tau a fost inregistrat cu succes in baza de date!</div>
+    <h5 id='green_message'>Ai votat deja! Lupta prezidentiala este foarte stransa! </h5>
     <table>
       <tr>
         <td>
-          <table>
-            <tr><td>Top candidati</td></tr>
-            <tr><td>1. Anton Mavrocordat (Partidul Social Liberal) 17 voturi</td></tr>
-            <tr><td>2. Sebastian Iulica (Partidul Democrat Liberal) 15 voturi</td></tr>
+          <table class="dbtbl">
+            <tr><th>Top candidati</th></tr>
+            <?php
+                $query = "SELECT candidat.nume, candidat.prenume, candidat.nume_partid,
+                          COUNT(candidat.nume) AS voturi FROM candidat
+                          INNER JOIN voturi ON voturi.id_candidat=candidat.id_candidat
+                          GROUP BY candidat.nume ORDER BY count(candidat.nume) DESC LIMIT 10";
+                if($stmt = $mysqli->prepare($query)) {
+                    $stmt->bind_result($sname, $fname, $party, $votes_count);
+                    $stmt->execute();
+                    $row_count = 1;
+                    while($stmt->fetch()) {
+                        echo "<tr><td>$row_count. $sname $fname ($party) $votes_count voturi</td></tr>";   
+                        $row_count++;
+                    }
+                    $stmt->close();
+                }
+            ?>
           </table>
         </td>
         <td>
-          <table>
-            <tr><td>Ultimele voturi</td></tr>
-            <tr><td>03.04 24:03 Marta Vasile -> Anton Mavrocordat</td></tr>
-            <tr><td>03.04 11:01 Sciabli Ecentu -> Sebastian Iulica</td></tr>
+          <table class="dbtbl">
+            <tr><th>Ultimele voturi</th></tr>
+            <?php
+                $query = "SELECT voturi.data_vot, voturi.timp_vot, 
+                          votant.nume, votant.prenume, candidat.nume, candidat.prenume 
+                          FROM voturi 
+                          INNER JOIN votant ON voturi.id_votant=votant.id_votant 
+                          INNER JOIN candidat ON voturi.id_candidat=candidat.id_candidat 
+                          ORDER BY voturi.id_votant DESC LIMIT 10";
+                if($stmt = $mysqli->prepare($query)) {
+                    $stmt->bind_result($vote_date, $vote_time, $voter_sname, $voter_fname,
+                                       $candidate_sname, $candidate_fname);
+                    $stmt->execute();
+                    while($stmt->fetch()) {
+                        echo "<tr><td>$vote_date $vote_time $voter_sname $voter_fname 
+                              <img src='images/singlevote_logo.jpg' alt=''> 
+                              $candidate_sname $candidate_fname</td></tr>";
+                    }
+                $stmt->close();
+                }
+            ?>
           </table>
         </td>
       </tr>

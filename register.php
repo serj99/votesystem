@@ -19,7 +19,7 @@ if($mysqli->connect_errno) {
 else
 	echo("<div style='font-size:x-small'>Connected succesfully to database!<br></div>");	 
 
-$newuser = 1;
+$newuser = -1;
 if(isset($_POST['btn-signup']))
 {
 	$email = $_POST['email'];	
@@ -142,10 +142,10 @@ if(isset($_POST['btn-signup']))
     </table>
   </form>
   <?php
-    if(!$newuser)
-        echo "<p id='red_message'>Un votant exista deja cu acest mail! Incearca din nou!</p>";
-    if($newuser)
-        echo "<p id='green_message'>Te-ai inregistrat cu succes! Votul tau conteaza!</p>";
+    if($newuser==0)
+        echo "<p class='red_message'>Un votant exista deja cu acest mail! Incearca din nou!</p>";
+    if($newuser==1)
+        echo "<p class='green_message'>Te-ai inregistrat cu succes! Votul tau conteaza!</p>";
   ?>
 
 

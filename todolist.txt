@@ -1,5 +1,5 @@
-1. Make online private repository and push the project files worked so far.
-2. Complete Top Candidates and Last Votes tables on home page.
-3. Generate polls and data on Generate Polls page.
-4. Create the root login for updating candidate and party tables content. 
+1. Make online private repository and push the project files worked so far. --done
+2. Complete Top Candidates and Last Votes tables on home page. --done
+3. Generate polls and data on Generate Polls page. --done
+4. Create the root login for updating candidate and party tables content. --done 
 5. Auto-select his corresponding party when choosing the candidate on home vote form. 

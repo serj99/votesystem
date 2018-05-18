@@ -8,8 +8,10 @@ $(document).ready(function() {
 	        data 	    : { 'party' : party },
 	        dataType 	: 'json',
 	        success 	: function(response) {
+                              var age = parseFloat(response.age);
+                              age = age.toFixed(1);
                               $("#AvgAge").empty();
-			                  $('#AvgAge').append('<p>' + response.age + ' ani </p>');
+			                  $('#AvgAge').append( "<p class='green_message'>" + age + ' ani </p>');
 			              }
 	    });
     });
@@ -21,7 +23,7 @@ $(document).ready(function() {
 	        dataType 	: 'json',
 	        success 	: function(response) {
                               $("#VotesCntPoor").empty();
-			                  $('#VotesCntPoor').append('<p>'+ response.votes_count + 
+			                  $('#VotesCntPoor').append("<p class='green_message'>"+ response.votes_count + 
                                                         ' voturi din ' + response.poorest_county + 
                                                         ', cel mai sarac judet din tara!</p>');
 			              }
@@ -36,7 +38,7 @@ $(document).ready(function() {
 	        dataType 	: 'json',
 	        success 	: function(response) {
                               $("#StudiesPercent").empty();
-			                  $('#StudiesPercent').append('<p>' + response.basic_perc.toPrecision(2) + 
+			                  $('#StudiesPercent').append("<p class='green_message'>" + response.basic_perc.toPrecision(2) + 
                                                         ' % din votanti au studii inferioare, pe cand doar ' +
                                                         + response.higher_perc.toPrecision(2) + ' % au studii superioare!</p>');
 			              }
@@ -53,7 +55,7 @@ $(document).ready(function() {
 	        dataType 	: 'json',
 	        success 	: function(response) {
                               $("#RegionVotes").empty();
-			                  $('#RegionVotes').append('<p>' + response.voters_count + 
+			                  $('#RegionVotes').append("<p class='green_message'>" + response.voters_count + 
                                                        ' votanti sunt din regiunea '
                                                        + region + '! </p>');
 			              }
@@ -69,10 +71,61 @@ $(document).ready(function() {
 	        dataType 	: 'json',
 	        success 	: function(response) {
                               $("#RegWin").empty();
-			                  $('#RegWin').append('<p>' + response.regionwin_party + 
+			                  $('#RegWin').append("<p class='green_message'>" + response.regionwin_party + 
                                                        ' are cele mai multe voturi in '
                                                        + region + '! </p>');
 			              }
+	    });
+    });
+    
+    $("#BttnDelCandid").click(function() {
+        var candid_id = $("#candid_to_del").val();
+        var candid_name = $("#candid_to_del option:selected").text();
+        console.log("here");
+        $.ajax({
+	        type    	: 'POST', //method type
+	        url     	: 'del_candid.php', //form processing file url
+            data        : { 'candid_id' : candid_id },
+	        dataType 	: 'json',
+	        success 	: function(response) {
+                              //location.reload(true);
+                              $("#MssgDelCandid").empty();
+                              if(response.success == 1)
+			                      $('#MssgDelCandid').append("<p id='green_message'>" 
+                                                              + candid_name + 
+                                                             " a fost sters cu succes din baza" +
+                                                             " de date! </p>");
+                              else 
+			                      $('#MssgDelCandid').append("<p id='red_message'>" + 
+                                                             'Eroare!' + response.success +
+                                                             ' </p>');
+			                 setTimeout(function() { location.reload() },3500);
+			              }
+	    });
+    });
+    
+    $("#BttnDelParty").click(function() {
+        var party = $("#party_to_del").val();
+        console.log("here");
+        $.ajax({
+	        type    	: 'POST', //method type
+	        url     	: 'del_party.php', //form processing file url
+            data        : { 'party' : party },
+	        dataType 	: 'json',
+	        success 	: function(response) {
+                              //location.reload(true);
+                              $("#MssgDelParty").empty();
+                              if(response.success == 1)
+			                      $('#MssgDelParty').append("<p id='green_message'>Partidul " 
+                                                              + party + 
+                                                             " a fost sters cu succes din baza" +
+                                                             " de date! </p>");
+                              else 
+			                      $('#MssgDelParty').append("<p id='red_message'>" + 
+                                                             'Eroare!' + response.success +
+                                                             ' </p>');
+			              setTimeout(function() { location.reload() },3500);
+                        }
 	    });
     });
 });

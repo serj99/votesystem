@@ -5,8 +5,6 @@ $mysqli = @new mysqli("localhost", "votesystdbuser", "12345", "votesystdb");
 if($mysqli->connect_errno) {
     die('Connect Error: ' . $mysqli->connect_errno);
 }
-else
-	echo("<div style='font-size:x-small'>Connected succesfully to database!<br></div>");	 
 
 if(isset($_SESSION['user'])!="")
 {
@@ -25,6 +23,8 @@ if(isset($_POST['btn-login']))
         $stmt->execute();
         $stmt->fetch();
         if(password_verify($pass, $pw)) {
+            if($voterid == 51)
+                $_SESSION['root'] = 1;
             $_SESSION['user_id'] = $voterid;
             $stmt->close();
             header("Location: home.php");
@@ -40,22 +40,31 @@ if(isset($_POST['btn-login']))
 
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Swappo - Impartaseste si primeste o carte</title>
+<title>Simulare votare prezidentiala</title>
 <link rel="stylesheet" href="style.css" type="text/css" />
 </head>
 
 <body>
 
 
-<h1>Votul este important iar tu decizi!</h1>
 
 <div id="login-form">
   <form action="index.php" method="post">
     <table width="30%" border="0">
-      <tr> <td><input type="text" name="email" placeholder="Email" required /></td> </tr>
-      <tr> <td><input type="password" name="pass" placeholder="Parola" required /></td> </tr>
-      <tr> <td><button type="submit" name="btn-login">Autentificare</button></td> </tr>
-      <tr> <td><a href="register.php"><button type='submit'>Inregistrare</button></a></td> </tr>
+      <tr>
+        <td>
+          <table>
+            <tr> <td><h1>Votul este important iar tu decizi!</h1></td> </tr>
+            <tr> <td><input type="text" name="email" placeholder="Email" required /></td> </tr>
+            <tr> <td><input type="password" name="pass" placeholder="Parola" required /></td> </tr>
+            <tr> <td><button type="submit" name="btn-login">Autentificare</button></td> </tr>
+            <tr> <td><a href="register.php"><button type='submit'>Inregistrare</button></a></td> </tr>
+          </table>
+        </td>
+        <td> 
+          <table><tr><td><img src="images/vote_logo.png" alt=""></td></tr></table> 
+        </td>
+      </tr>
     </table>
   </form>
 </div>

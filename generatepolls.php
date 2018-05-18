@@ -29,9 +29,9 @@ if($stmt = $mysqli->prepare($query)) {
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <title>Simulare votari regionale</title>
+<link rel="stylesheet" href="style.css" type="text/css" />
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script type='text/javascript' src='script.js'></script> 
-<link rel="stylesheet" href="style.css" type="text/css" />
 </head>
 
 
@@ -55,7 +55,7 @@ if($stmt = $mysqli->prepare($query)) {
       </ul>
     </div>
 
-    <table>
+    <table id="gen_polls_pg">
       <tr>
         <td>Varsta medie a votantilor partidului
           <select id='party' name='party'>
