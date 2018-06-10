@@ -16,8 +16,6 @@ $mysqli = @new mysqli("localhost", "votesystdbuser", "12345", "votesystdb");
 if($mysqli->connect_errno) {
     die('Connect Error: ' . $mysqli->connect_errno);
 }
-else
-	echo("<div style='font-size:x-small'>Connected succesfully to database!<br></div>");	 
 
 $newuser = -1;
 if(isset($_POST['btn-signup']))
@@ -29,7 +27,6 @@ if(isset($_POST['btn-signup']))
         $stmt->execute();
         $stmt->bind_result($name);
         $stmt->fetch();
-        echo "nume votant: $name";
         if($name) {
             $newuser = 0;
         }
@@ -38,7 +35,6 @@ if(isset($_POST['btn-signup']))
     
     //if we got new user
     if($newuser) {
-        echo "email: $email<br>";
         $secondname = $_POST['nume'];
         $firstname = $_POST['prenume'];
         $age = $_POST['varsta'];
@@ -72,7 +68,7 @@ if(isset($_POST['btn-signup']))
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Coding Cage - Login & Registration System</title>
+<title>Simulare Votari Prezidentiale</title>
 <link rel="stylesheet" href="style.css" type="text/css" />
 </head>
 

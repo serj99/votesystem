@@ -150,8 +150,8 @@ $(document).ready(function() {
             type: 'post',
             dataType: "json",
             success: function(result) {
-                        $("#candidate option[value=" + result.candid_id + "]").prop("selected", true);
-                         //$('#candidate').val(result.candid_id);
+                        //$("#candidate option[value=" + result.candid_id + "]").prop("selected", true);
+                        $('#candidate').val(result.candid_id);
                      }
         });
     });

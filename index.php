@@ -50,11 +50,11 @@ if(isset($_POST['btn-login']))
 
 <div id="login-form">
   <form action="index.php" method="post">
-    <table width="30%" border="0">
+    <table width="30%">
       <tr>
         <td>
           <table>
-            <tr> <td><h1>Votul este important iar tu decizi!</h1></td> </tr>
+            <tr> <td><h4>Votul este important iar tu decizi!</h4></td> </tr>
             <tr> <td><input type="text" name="email" placeholder="Email" required /></td> </tr>
             <tr> <td><input type="password" name="pass" placeholder="Parola" required /></td> </tr>
             <tr> <td><button type="submit" name="btn-login">Autentificare</button></td> </tr>

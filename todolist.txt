@@ -2,4 +2,5 @@
 2. Complete Top Candidates and Last Votes tables on home page. --done
 3. Generate polls and data on Generate Polls page. --done
 4. Create the root login for updating candidate and party tables content. --done 
-5. Auto-select his corresponding party when choosing the candidate on home vote form. 
+5. Auto-select his corresponding party when choosing the candidate on home vote form. --done
+6. Publicize the website on a free hosting platform. 

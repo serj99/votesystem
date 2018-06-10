@@ -4,11 +4,10 @@ if(!isset($_SESSION['user_id']))
     header("Location: index.php");
 
 $mysqli = new mysqli("localhost", "votesystdbuser", "12345", "votesystdb");
+
 if($mysqli->connect_errno) {
     die('Connect Error: ' . $mysqli->connect_errno);
 }
-else
-	echo("<div style='font-size:x-small'>Connected succesfully to database!<br></div>");	 
 
 $query = "SELECT nume, prenume, varsta, educatie, venit_lunar, casatorit
           FROM votant WHERE id_votant = ?";
@@ -45,11 +44,8 @@ if(isset($_POST['btn-vote'])) {
     $county = $_POST['county'];
     $vote_time = date("H:i:s");
     $vote_date = date("Y-m-d");
-    echo "vote date = $vote_date<br>";
     $ip = $_SERVER['REMOTE_ADDR'];
-    echo "ip = $ip<br>";
     $os = $_POST['platform'];
-    echo "os = $os<br>";
     
     $query = "INSERT INTO voturi(id_votant, id_candidat, nume_partid,
               nume_judet, timp_vot, data_vot, ip, sistem_operare)
@@ -74,12 +70,12 @@ if(isset($_POST['btn-vote'])) {
 ?>
 
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" >
+<!DOCTYPE html>
+<html>
 
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Simulare votari regionale</title>
+<title>Simulare votari prezidentiale</title>
 <link rel="stylesheet" href="style.css" type="text/css" />
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script type='text/javascript' src='script.js'></script> 
@@ -97,16 +93,18 @@ if(isset($_POST['btn-vote'])) {
     </div>
 </div>
 
-<div id="body">
-  <div id='puthere'></div>
-  <div id="nav">
-    <ul>
-      <li><a href="home.php">Acasa</a></li>
-      <li><a href="generatepolls.php">Genereaza sondaje</a></li>
-    </ul>
-  </div>
+<body>
+<!-- <div id="body"> -->
+<div id='puthere'></div>
+<div id="nav">
+  <ul>
+    <li><a href="home.php">Acasa</a></li>
+    <li><a href="generatepolls.php">Genereaza sondaje</a></li>
+  </ul>
+</div>
 
-  <?php if(isset($_SESSION['root'])) : ?>
+<?php if(isset($_SESSION['root'])) : ?>
+    <!-- start of root user page -->
     <table>
       <tr>
         <td>
@@ -161,74 +159,81 @@ if(isset($_POST['btn-vote'])) {
         <td id='MssgDelParty'colspan='2'></td>
       </tr>
     </table>  
+    <!-- end of root user page -->
 
-  <?php elseif (!isset($_SESSION['root']) && $uservoted == 0) : ?>    
-      <form id='voteform' method="post">
-        <table>
-          <tr>
-            <td><label for='county'>Judet resedinta</label></td>
-            <td><select id='county' name='county'>
-              <?php 
-                  $query = "SELECT nume_judet FROM judet";
-                  if($stmt = $mysqli->prepare($query)) {
-                      $stmt->bind_result($county);
-                      $stmt->execute();
-                      while($stmt->fetch())
-                          echo "<option value='{$county}'>$county</option>";
-                      $stmt->close();
-                  }
-              ?>
-            </td>
-          </tr>
-          <tr>
-            <td><label for='candidate'>Candidat</label></td>
-            <td><select id='candidate' name='candidate'>
-              <?php
-                  $query = "SELECT id_candidat, nume, prenume FROM candidat";
-                  if($stmt = $mysqli->prepare($query)) {
-                      $stmt->bind_result($candidate_id, $candidate_sname, $candidate_fname);
-                      $stmt->execute();
-                      while($stmt->fetch())
-                          echo "<option value='{$candidate_id}'>$candidate_sname" . 
-                               " $candidate_fname</option>"; 
-                      $stmt->close();
-                  }
-               ?>
-             </td>
-          </tr>
-          <tr>
-            <td><label for='party'>Partid</label></td>
-            <td>
-              <select id='party' name='party'>
-              <?php
-                  $query = "SELECT nume_partid FROM partid";
-                  if($stmt = $mysqli->prepare($query)) {
-                      $stmt->bind_result($partyname);
-                      $stmt->execute();
-                      while($stmt->fetch())
-                          echo "<option value='{$partyname}'>$partyname</option>";
-                      $stmt->close();
-                  }
-              ?>
-              </select>
-            </td>
-          </tr>
-          <tr>
-            <td colspan='2'>
-              <input type='hidden' name='platform' id='platform' value=''>
-                <script>
-                  document.getElementById("platform").value = navigator.platform;
-                </script>
-            </td>
-          <tr>
-            <td colspan='2'>
-              <button type='submit' name='btn-vote'>Voteaza</button>
-            </td>
-          </tr>
-        </table>
-  <?php 
-    elseif( !isset($_SESSION['root']) && $uservoted == 1) : 
-  ?>
+<?php elseif (!isset($_SESSION['root']) && $uservoted == 0) : ?>   
+    <!-- start of voter user page, vote not submited yet --> 
+    <form id='voteform' method="post">
+      <table>
+        <tr>
+          <td><label for='county'>Judet resedinta</label></td>
+          <td><select id='county' name='county'>
+            <?php 
+                $query = "SELECT nume_judet FROM judet";
+                if($stmt = $mysqli->prepare($query)) {
+                    $stmt->bind_result($county);
+                    $stmt->execute();
+                    while($stmt->fetch())
+                        echo "<option value='{$county}'>$county</option>";
+                    $stmt->close();
+                }
+            ?>
+          </td>
+        </tr>
+        <tr>
+          <td><label for='candidate'>Candidat</label></td>
+          <td><select id='candidate' name='candidate'>
+            <?php
+                $query = "SELECT id_candidat, nume, prenume FROM candidat";
+                if($stmt = $mysqli->prepare($query)) {
+                    $stmt->bind_result($candidate_id, $candidate_sname, $candidate_fname);
+                    $stmt->execute();
+                    while($stmt->fetch())
+                        echo "<option value='{$candidate_id}'>$candidate_sname" . 
+                             " $candidate_fname</option>"; 
+                    $stmt->close();
+                }
+             ?>
+           <div id="addp"></div>
+           </td>
+        </tr>
+        <tr>
+          <td><label for='party'>Partid</label></td>
+          <td>
+            <select id='party' name='party'>
+            <?php
+                $query = "SELECT nume_partid FROM partid";
+                if($stmt = $mysqli->prepare($query)) {
+                    $stmt->bind_result($partyname);
+                    $stmt->execute();
+                    while($stmt->fetch())
+                        echo "<option value='{$partyname}'>$partyname</option>";
+                    $stmt->close();
+                }
+            ?>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td colspan='2'>
+            <input type='hidden' name='platform' id='platform' value=''>
+              <script>
+                document.getElementById("platform").value = navigator.platform;
+              </script>
+          </td>
+        <tr>
+          <td colspan='2'>
+            <button type='submit' name='btn-vote'>Voteaza</button>
+          </td>
+        </tr>
+      </table>
+    </form>
+    <!-- start of voter user page, vote not submited yet --> 
+
+<?php 
+  elseif( !isset($_SESSION['root']) && $uservoted == 1) : 
+?>
+    <!-- start of voter user page, vote submitted --> 
     <h5 id='green_message'>Ai votat deja! Lupta prezidentiala este foarte stransa! </h5>
     <table>
       <tr>
@@ -279,52 +284,10 @@ if(isset($_POST['btn-vote'])) {
         </td>
       </tr>
     </table>
-  <?php endif; ?>    
+    <!-- start of voter user page, vote submitted --> 
+<?php endif; ?>    
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<!-- </div> -->
+</body>
 
 </html>

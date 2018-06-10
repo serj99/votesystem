@@ -7,8 +7,6 @@ $mysqli = new mysqli("localhost", "votesystdbuser", "12345", "votesystdb");
 if($mysqli->connect_errno) {
     die('Connect Error: ' . $mysqli->connect_errno);
 }
-else
-	echo("<div style='font-size:x-small'>Connected succesfully to database!<br></div>");	 
 
 $query = "SELECT nume, prenume, varsta, educatie, venit_lunar, casatorit
           FROM votant WHERE id_votant = ?";
@@ -23,8 +21,8 @@ if($stmt = $mysqli->prepare($query)) {
 
 ?>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" >
+<!DOCTYPE html>
+<html>
 
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -46,8 +44,7 @@ if($stmt = $mysqli->prepare($query)) {
       </div>
   </div>
 
-  <div id="body">
-    <div id='puthere'></div>
+  <body>
     <div id="nav">
       <ul>
         <li><a href="home.php">Acasa</a></li>
@@ -55,7 +52,7 @@ if($stmt = $mysqli->prepare($query)) {
       </ul>
     </div>
 
-    <table id="gen_polls_pg">
+    <table id="genpolls_tbl">
       <tr>
         <td>Varsta medie a votantilor partidului
           <select id='party' name='party'>
@@ -143,5 +140,5 @@ if($stmt = $mysqli->prepare($query)) {
         <td id='RegWin' colspan='2'></td>
       </tr>
     </table>  
-      
+  </body>
 </html> 
