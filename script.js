@@ -128,5 +128,32 @@ $(document).ready(function() {
                         }
 	    });
     });
+    $('#candidate').change(function() {
+        var candid_id = $("#candidate").val();
+        $.ajax({ 
+            url: 'autoselect_getparty.php',
+            data: { "candid_id" : candid_id },
+            dataType: "json",
+            type: 'post',
+            success: function(result) {
+                        //$("#party option[value='" + result.party + "']").prop("selected", true);
+                        $("#party").val(result.party);
+                     }
+        });
+                    
+    });
+    $('#party').change(function() {
+        var party = $("#party").val();
+        $.ajax({ 
+            url: 'autoselect_getcandid.php',
+            data: { "party" : party },
+            type: 'post',
+            dataType: "json",
+            success: function(result) {
+                        $("#candidate option[value=" + result.candid_id + "]").prop("selected", true);
+                         //$('#candidate').val(result.candid_id);
+                     }
+        });
+    });
 });
  
